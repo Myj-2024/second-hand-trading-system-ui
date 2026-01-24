@@ -164,6 +164,24 @@ export const constantRoutes = [
     ],
   },
 
+  // ========== 新增用户管理路由 ==========
+  {
+    path: "/user",
+    component: Layout,
+    redirect: "/user/index",
+    name: "UserManage",
+    meta: { title: "用户管理", icon: "user" }, // icon使用内置的user图标
+    children: [
+      {
+        path: "index",
+        name: "UserList",
+        component: () => import("@/views/user/index"), // 对应用户列表页面
+        meta: { title: "用户列表", icon: "user" },
+      },
+    ],
+  },
+  // =====================================
+
   // 404 page must be placed at the end !!!
   { path: "*", redirect: "/404", hidden: true },
 ];
