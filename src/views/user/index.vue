@@ -15,16 +15,29 @@
                 <el-button type="primary" icon="el-icon-search" @click=" getUserList ">查询</el-button>
                 <el-button icon="el-icon-refresh" @click=" resetSearch ">重置</el-button>
                 <el-button type="success" icon="el-icon-plus" @click=" handleAdd ">新增用户</el-button>
+                <!-- 新增：批量删除按钮 -->
+                <el-button type="danger" icon="el-icon-delete" @click=" handleBatchDelete "
+                    :disabled=" !multipleSelection.length ">
+                    批量删除
+                </el-button>
             </el-form-item>
         </el-form>
 
         <!-- 用户列表 -->
         <el-table v-loading=" loading " :data=" userList " border stripe highlight-current-row
-            style="width: 100%; margin-top: 10px">
+            style="width: 100%; margin-top: 10px" @selection-change=" handleSelectionChange " ref="userTable">
+            <!-- 新增：多选列 -->
+            <el-table-column type="selection" width="55" align="center" />
             <el-table-column prop="id" label="用户ID" width="80" align="center" />
             <el-table-column prop="username" label="用户名" width="120" align="center" />
             <el-table-column prop="nickname" label="昵称" width="120" align="center" />
             <el-table-column prop="phone" label="手机号" width="150" align="center" />
+            <!-- 新增：头像列 -->
+            <el-table-column label="头像" width="100" align="center">
+                <template slot-scope="scope">
+                    <img :src=" scope.row.avatar || '/default-avatar.png' " class="table-avatar" alt="用户头像" />
+                </template>
+            </el-table-column>
             <el-table-column prop="status" label="状态" width="100" align="center">
                 <template slot-scope="scope">
                     <el-tag :type=" scope.row.status === 1 ? 'success' : 'danger' ">
@@ -33,9 +46,10 @@
                 </template>
             </el-table-column>
             <el-table-column prop="createTime" label="创建时间" width="200" align="center" />
+            <!-- 新增：修改时间列 -->
+            <el-table-column prop="updateTime" label="修改时间" width="200" align="center" />
             <el-table-column label="操作" width="350" align="center">
                 <template slot-scope="scope">
-                    <!-- 加一个div，强制按钮换行 -->
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                         <el-button type="primary" size="mini" icon="el-icon-edit"
                             @click="handleEdit(scope.row)">编辑</el-button>
@@ -68,8 +82,14 @@
                 <el-form-item label="手机号" prop="phone">
                     <el-input v-model=" userForm.phone " placeholder="请输入手机号" />
                 </el-form-item>
-                <el-form-item label="头像URL" prop="avatar">
-                    <el-input v-model=" userForm.avatar " placeholder="请输入头像URL" />
+                <!-- 修改：头像上传组件（替换原URL输入框） -->
+                <el-form-item label="头像" prop="avatar">
+                    <el-upload class="avatar-uploader" action="#" :show-file-list=" false "
+                        :before-upload=" beforeAvatarUpload " :http-request=" uploadAvatar "
+                        :loading=" avatarUploadLoading ">
+                        <img v-if="userForm.avatar" :src=" userForm.avatar " class="avatar" />
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
                 </el-form-item>
                 <el-form-item label="状态" prop="status">
                     <el-radio-group v-model=" userForm.status ">
@@ -90,14 +110,15 @@
 </template>
 
 <script>
-// 注意：确保api路径正确
+// 导入新增的接口
 import
 {
     listUsers,
     addUser,
     updateUser,
-    deleteUser,
+    deleteUsers, // 合并后的删除接口
     resetPassword,
+    uploadAvatar
 } from "@/api/userManage";
 
 export default {
@@ -169,6 +190,10 @@ export default {
                 nickname: [{ validator: validateNickname, trigger: "blur" }],
                 password: [{ validator: validatePassword, trigger: "blur" }],
             },
+            // 新增：批量选择的用户ID
+            multipleSelection: [],
+            // 新增：头像上传加载状态
+            avatarUploadLoading: false
         };
     },
     created()
@@ -182,7 +207,7 @@ export default {
         {
             this.loading = true;
             const params = {
-                pageNum: this.pageNum, // 前端传pageNum，后端DTO改为pageNum后匹配
+                pageNum: this.pageNum,
                 pageSize: this.pageSize,
                 username: this.searchForm.username,
                 status: this.searchForm.status,
@@ -192,7 +217,6 @@ export default {
                 {
                     this.loading = false;
                     if (response.code === 200) {
-                        // ✅ 正确解析：records和total都在response.data里
                         this.userList = response.data.records || [];
                         this.total = response.data.total || 0;
                     } else {
@@ -230,18 +254,15 @@ export default {
             this.getUserList();
         },
 
-        // 5. 新增用户（核心修复：确保弹窗正常显示）
+        // 5. 新增用户
         handleAdd()
         {
             try {
                 this.dialogType = "add";
                 this.dialogTitle = "新增用户";
                 this.isEdit = false;
-                // 先重置表单，再显示弹窗
                 this.resetUserForm();
                 this.dialogVisible = true;
-                // 调试日志（可选，可删除）
-                console.log("新增用户按钮点击，弹窗显示状态：", this.dialogVisible);
             } catch (e) {
                 console.error("新增用户按钮点击异常：", e);
                 this.$message.error("操作异常，请刷新页面重试");
@@ -254,15 +275,14 @@ export default {
             this.dialogType = "edit";
             this.dialogTitle = "编辑用户";
             this.isEdit = true;
-            // 回显数据（确保类型匹配）
             this.userForm = {
                 id: row.id || "",
                 username: row.username || "",
                 nickname: row.nickname || "",
                 phone: row.phone || "",
                 avatar: row.avatar || "",
-                status: (row.status || 1) + "", // 转为字符串匹配radio
-                password: "", // 编辑时不显示密码
+                status: (row.status || 1) + "",
+                password: "",
             };
             this.dialogVisible = true;
         },
@@ -273,22 +293,18 @@ export default {
             this.$refs.userForm.validate((valid) =>
             {
                 if (valid) {
-                    // 新增用户
                     if (this.dialogType === "add") {
                         addUser(this.userForm)
                             .then((response) =>
                             {
-                                // 核心：先判断response是否存在
                                 if (!response) {
                                     this.$message.error("新增用户失败：后端无响应");
                                     return;
                                 }
-                                // 判断后端返回的成功状态
                                 if (response.code === 200) {
                                     this.$message.success("新增用户成功");
-                                    this.dialogVisible = false; // 仅关闭弹窗，不刷新列表
-                                    // 注释掉列表刷新，后续分页功能完成后再打开
-                                    // this.getUserList();
+                                    this.dialogVisible = false;
+                                    this.getUserList(); // 新增：提交后刷新列表
                                 } else {
                                     this.$message.error(response.msg || "新增用户失败");
                                 }
@@ -300,7 +316,6 @@ export default {
                                 );
                             });
                     } else {
-                        // 编辑用户逻辑（保持不变，若暂时不需要可先注释）
                         updateUser(this.userForm)
                             .then((response) =>
                             {
@@ -311,7 +326,7 @@ export default {
                                 if (response.code === 200) {
                                     this.$message.success("编辑用户成功");
                                     this.dialogVisible = false;
-                                    // this.getUserList();
+                                    this.getUserList();
                                 } else {
                                     this.$message.error(response.msg || "编辑用户失败");
                                 }
@@ -330,7 +345,7 @@ export default {
             });
         },
 
-        // 8. 删除用户
+        // 8. 删除用户（修改：调用合并后的deleteUsers接口）
         handleDelete(row)
         {
             this.$confirm("确定要删除该用户吗？", "提示", {
@@ -340,12 +355,13 @@ export default {
             })
                 .then(() =>
                 {
-                    deleteUser(row.id)
+                    // 单个删除：传入单个ID，接口内部转为数组
+                    deleteUsers(row.id)
                         .then((response) =>
                         {
                             if (response.code === 200) {
                                 this.$message.success("删除用户成功");
-                                this.getUserList(); // 刷新列表
+                                this.getUserList();
                             } else {
                                 this.$message.error(response.msg || "删除用户失败");
                             }
@@ -391,7 +407,7 @@ export default {
                 });
         },
 
-        // 重置表单（核心修复：兼容表单未渲染的情况）
+        // 重置表单
         resetUserForm()
         {
             this.userForm = {
@@ -403,7 +419,6 @@ export default {
                 status: "1",
                 password: "",
             };
-            // 延迟重置校验状态，避免表单未挂载
             this.$nextTick(() =>
             {
                 if (this.$refs.userForm) {
@@ -411,6 +426,99 @@ export default {
                 }
             });
         },
+
+        // 新增：头像上传前校验
+        beforeAvatarUpload(file)
+        {
+            const isImage = file.type.startsWith('image/');
+            const isLt2M = file.size / 1024 / 1024 < 2;
+
+            if (!isImage) {
+                this.$message.error('只能上传图片格式文件！');
+                return false;
+            }
+            if (!isLt2M) {
+                this.$message.error('头像图片大小不能超过2MB！');
+                return false;
+            }
+            return true;
+        },
+
+        // 新增：头像上传逻辑（对接后端upload接口）
+        uploadAvatar(options)
+        {
+            this.avatarUploadLoading = true;
+            const formData = new FormData();
+            formData.append('file', options.file); // 后端接收的文件字段名
+
+            uploadAvatar(formData)
+                .then(response =>
+                {
+                    this.avatarUploadLoading = false;
+                    if (response.code === 200) {
+                        // 后端返回的图片地址赋值给表单
+                        this.userForm.avatar = response.data;
+                        this.$message.success('头像上传成功！');
+                    } else {
+                        this.$message.error(response.msg || '头像上传失败');
+                    }
+                })
+                .catch(error =>
+                {
+                    this.avatarUploadLoading = false;
+                    this.$message.error('头像上传失败：' + (error.message || error));
+                });
+        },
+
+        // 新增：多选事件（获取选中的用户）
+        handleSelectionChange(val)
+        {
+            this.multipleSelection = val;
+        },
+
+        // 新增：批量删除用户（修改：调用合并后的deleteUsers接口）
+        handleBatchDelete()
+        {
+            if (!this.multipleSelection.length) {
+                this.$message.warning("请选择要删除的用户");
+                return;
+            }
+
+            // 过滤掉admin用户
+            const canDeleteList = this.multipleSelection.filter(item => item.username !== 'admin');
+            if (!canDeleteList.length) {
+                this.$message.warning("admin用户不允许删除");
+                return;
+            }
+
+            this.$confirm(`确定要删除选中的${ canDeleteList.length }个用户吗？`, "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+            }).then(() =>
+            {
+                // 提取用户ID数组，传入合并后的接口
+                const ids = canDeleteList.map(item => item.id);
+                deleteUsers(ids)
+                    .then(response =>
+                    {
+                        if (response.code === 200) {
+                            this.$message.success("批量删除用户成功");
+                            this.getUserList(); // 刷新列表
+                            this.$refs.userTable.clearSelection(); // 清空选择
+                        } else {
+                            this.$message.error(response.msg || "批量删除用户失败");
+                        }
+                    })
+                    .catch(error =>
+                    {
+                        this.$message.error("批量删除用户失败：" + (error.message || error));
+                    });
+            }).catch(() =>
+            {
+                this.$message.info("已取消批量删除");
+            });
+        }
     },
 };
 </script>
@@ -420,55 +528,78 @@ export default {
 .app-container {
     padding: 20px;
     min-width: 1000px;
-    /* 避免页面过窄导致布局错乱 */
 }
 
 /* 搜索栏样式优化 */
 .search-form {
     background: #f5f5f5;
     padding: 15px 20px;
-    /* 增加内边距，更舒展 */
     border-radius: 6px;
     margin-bottom: 15px;
-    /* 与表格拉开距离 */
     display: flex;
     align-items: center;
     gap: 10px;
-    /* 按钮/表单项之间的间距 */
 }
 
 /* 表格样式优化 */
 .el-table {
     --el-table-row-hover-bg-color: #f8fafc;
-    /* 优化 hover 背景色 */
     --el-table-border-color: #e2e8f0;
-    /* 优化边框色 */
     font-size: 14px;
 }
 
-/* 表格列宽适配优化（操作栏按钮分散） */
+/* 表格头像样式 */
+.table-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 头像上传组件样式 */
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+}
+
+.avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+}
+
+.avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+}
+
+.avatar {
+    width: 100px;
+    height: 100px;
+    display: block;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+/* 其他原有样式保持不变 */
 .el-table-column--width-250 {
     width: 280px !important;
-    /* 加宽操作栏，避免按钮拥挤 */
 }
 
 .el-table-column--width-200 {
     width: 220px !important;
-    /* 加宽创建时间列，避免文字换行 */
 }
 
-/* 操作栏按钮间距优化 */
 .el-table .el-button--mini {
     margin-right: 8px;
-    /* 按钮之间增加间距 */
+    margin-bottom: 4px;
 }
 
-.el-table .el-button--mini:last-child {
-    margin-right: 0;
-    /* 最后一个按钮取消右边距 */
-}
-
-/* 分页控件样式优化 */
 .el-pagination {
     margin-top: 20px;
     padding: 10px 0;
@@ -476,23 +607,18 @@ export default {
     font-size: 14px;
 }
 
-/* 弹窗表单样式优化 */
 .el-dialog__body {
     padding: 20px !important;
-    /* 增加弹窗内边距 */
 }
 
 .el-form-item {
     margin-bottom: 18px !important;
-    /* 表单项间距优化 */
 }
 
 .el-form-item__label {
     font-weight: 500;
-    /* 标签加粗，更醒目 */
 }
 
-/* 按钮样式微调 */
 .el-button--primary {
     background-color: #409eff;
 }
@@ -505,24 +631,12 @@ export default {
     background-color: #f56c6c;
 }
 
-/* 1. 强制加宽操作列（确保足够空间） */
 .el-table-column--label-操作 {
     min-width: 300px !important;
-    /* 加宽操作列，确保按钮不拥挤 */
 }
 
-/* 2. 操作栏按钮换行（空间不足时自动换行） */
 .el-table .cell {
     white-space: normal !important;
-    /* 取消按钮的强制不换行 */
     line-height: 32px;
-    /* 按钮换行后的行高 */
-}
-
-/* 3. 按钮间距再加大 */
-.el-table .el-button--mini {
-    margin-right: 8px;
-    margin-bottom: 4px;
-    /* 增加按钮底部间距，换行后更美观 */
 }
 </style>
