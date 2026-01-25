@@ -2,8 +2,20 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-        "@/*": ["src/*"]
-    }
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "types": [
+      "minimatch",
+      "node"
+    ], // 显式声明需要的类型库
+    "target": "ES6", // 指定ECMAScript版本
+    "module": "ESNext", // 模块系统
+    "moduleResolution": "Node" // 模块解析方式
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
