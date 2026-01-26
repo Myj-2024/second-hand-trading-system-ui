@@ -530,6 +530,21 @@ export default {
     min-width: 1000px;
 }
 
+/* 表格样式优化 */
+.el-table {
+  --el-table-row-hover-bg-color: #f8fafc;
+  --el-table-border-color: #e2e8f0;
+  font-size: 12px;
+}
+
+/* 表格头像样式 */
+.table-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 /* 搜索栏样式优化 */
 .search-form {
     background: #f5f5f5;
@@ -539,21 +554,6 @@ export default {
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-/* 表格样式优化 */
-.el-table {
-    --el-table-row-hover-bg-color: #f8fafc;
-    --el-table-border-color: #e2e8f0;
-    font-size: 14px;
-}
-
-/* 表格头像样式 */
-.table-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
 }
 
 /* 头像上传组件样式 */
@@ -586,37 +586,22 @@ export default {
     object-fit: cover;
 }
 
-/* 其他原有样式保持不变 */
-.el-table-column--width-250 {
-    width: 280px !important;
-}
-
-.el-table-column--width-200 {
-    width: 220px !important;
-}
-
 .el-table .el-button--mini {
-    margin-right: 8px;
+    margin-right: 2px;
     margin-bottom: 4px;
 }
 
 .el-pagination {
     margin-top: 20px;
-    padding: 10px 0;
+    padding: 5px 0;
     text-align: right;
-    font-size: 14px;
+    font-size: 10px;
 }
 
-.el-dialog__body {
-    padding: 20px !important;
-}
-
-.el-form-item {
-    margin-bottom: 18px !important;
-}
 
 .el-form-item__label {
-    font-weight: 500;
+    font-weight: 600;
+    color: #222222;
 }
 
 .el-button--primary {
@@ -635,8 +620,5 @@ export default {
     min-width: 300px !important;
 }
 
-.el-table .cell {
-    white-space: normal !important;
-    line-height: 32px;
-}
+
 </style>

@@ -1,3 +1,4 @@
+
 <template>
     <div class="app-container">
         <el-form :inline=" true " :model=" queryParams " class="search-form" @submit.prevent>
@@ -32,8 +33,8 @@
             </el-col>
         </el-row>
 
-        <el-table v-loading=" loading " :data=" goodsList " @selection-change=" handleSelectionChange " border fit
-            highlight-current-row ref="goodsTable" style="width: 100%; min-width: 1400px;">
+        <el-table v-fit-columns v-loading=" loading " :data=" goodsList " @selection-change=" handleSelectionChange " border fit
+            highlight-current-row ref="goodsTable" style="width: 100%;">
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column label="商品ID" prop="id" width="80" align="center" />
             <el-table-column label="商品名称" prop="goodsName" min-width="150" />
@@ -130,6 +131,7 @@
 
 <script>
 import goodsApi from '@/api/goods'
+
 
 export default {
     name: 'GoodsManagement',
@@ -462,33 +464,41 @@ export default {
 
 <style scoped>
 .app-container {
-    padding: 20px;
-    min-width: 1000px;
-    overflow-x: auto;
+  padding: 20px;
+  min-width: 1000px;
 }
 
-.search-form {
-    background: #f5f5f5;
-    padding: 15px 20px;
-    border-radius: 6px;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 1400px;
+.el-table {
+  --el-table-row-hover-bg-color: #f8fafc;
+  --el-table-border-color: #e2e8f0;
+  font-size: 12px;
+  margin-top: 10px;
 }
 
-.mb8 {
-    margin-bottom: 8px;
-    min-width: 1400px;
+.el-pagination {
+  margin-top: 20px;
+  padding: 5px 0;
+  text-align: right;
+  font-size: 10px;
 }
 
 .table-img {
-    width: 80px;
-    height: 80px;
-    border-radius: 4px;
-    object-fit: cover;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
 }
+
+.search-form {
+  background: #f5f5f5;
+  padding: 15px 20px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 
 .img-uploader .el-upload {
     border: 1px dashed #d9d9d9;
@@ -516,35 +526,4 @@ export default {
     object-fit: cover;
 }
 
-.el-table {
-    --el-table-row-hover-bg-color: #f8fafc;
-    --el-table-border-color: #e2e8f0;
-    font-size: 14px;
-    width: 100%;
-    min-width: 1400px;
-}
-
-.el-pagination {
-    margin-top: 20px;
-    padding: 10px 0;
-    text-align: right;
-    font-size: 14px;
-    min-width: 1400px;
-}
-
-.el-dialog__body {
-    padding: 20px !important;
-}
-
-.el-form-item {
-    margin-bottom: 18px !important;
-}
-
-.el-form-item__label {
-    font-weight: 500;
-}
-
-.el-table .el-button--mini {
-    margin: 4px;
-}
 </style>
