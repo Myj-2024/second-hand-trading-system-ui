@@ -28,26 +28,26 @@
             style="width: 100%; margin-top: 10px" @selection-change=" handleSelectionChange " ref="userTable">
             <!-- 新增：多选列 -->
             <el-table-column type="selection" width="55" align="center" />
-            <el-table-column prop="id" label="用户ID" width="80" align="center" />
-            <el-table-column prop="username" label="用户名" width="120" align="center" />
-            <el-table-column prop="nickname" label="昵称" width="120" align="center" />
-            <el-table-column prop="phone" label="手机号" width="150" align="center" />
+            <el-table-column prop="id" label="用户ID" width="60" align="center" />
+            <el-table-column prop="username" label="用户名" width="90" align="center" />
+            <el-table-column prop="nickname" label="昵称" width="90" align="center" />
+            <el-table-column prop="phone" label="手机号" width="120" align="center" />
             <!-- 新增：头像列 -->
-            <el-table-column label="头像" width="100" align="center">
+            <el-table-column label="头像" width="120" align="center">
                 <template slot-scope="scope">
                     <img :src=" scope.row.avatar || '/default-avatar.png' " class="table-avatar" alt="用户头像" />
                 </template>
             </el-table-column>
-            <el-table-column prop="status" label="状态" width="100" align="center">
+            <el-table-column prop="status" label="状态" width="120" align="center">
                 <template slot-scope="scope">
                     <el-tag :type=" scope.row.status === 1 ? 'success' : 'danger' ">
                         {{ scope.row.status === 1 ? "正常" : "禁用" }}
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="createTime" label="创建时间" width="200" align="center" />
+            <el-table-column prop="createTime" label="创建时间" width="120" align="center" />
             <!-- 新增：修改时间列 -->
-            <el-table-column prop="updateTime" label="修改时间" width="200" align="center" />
+            <el-table-column prop="updateTime" label="修改时间" width="120" align="center" />
             <el-table-column label="操作" width="350" align="center">
                 <template slot-scope="scope">
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
@@ -614,10 +614,6 @@ export default {
 
 .el-button--danger {
     background-color: #f56c6c;
-}
-
-.el-table-column--label-操作 {
-    min-width: 300px !important;
 }
 
 

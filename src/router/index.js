@@ -30,108 +30,12 @@ export const constantRoutes = [
     children: [
       {
         path: "dashboard",
-        name: "仪表盘",
+        name: "主页",
         component: () => import("@/views/dashboard/index"),
-        meta: { title: "仪表盘", icon: "el-icon-s-data" }, // Element UI 数据图标
+        meta: { title: "主页", icon: "el-icon-s-data" }, // Element UI 数据图标
       },
     ],
   },
-
-  // {
-  //   path: "/example",
-  //   component: Layout,
-  //   redirect: "/example/table",
-  //   name: "Example",
-  //   meta: { title: "示例管理", icon: "el-icon-s-tools" }, // Element UI 工具图标
-  //   children: [
-  //     {
-  //       path: "table",
-  //       name: "Table",
-  //       component: () => import("@/views/table/index"),
-  //       meta: { title: "表格示例", icon: "el-icon-s-grid" }, // Element UI 表格图标
-  //     },
-  //     {
-  //       path: "tree",
-  //       name: "Tree",
-  //       component: () => import("@/views/tree/index"),
-  //       meta: { title: "树形示例", icon: "el-icon-tree" }, // Element UI 树形图标
-  //     },
-  //   ],
-  // },
-
-  // {
-  //   path: "/form",
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: "index",
-  //       name: "Form",
-  //       component: () => import("@/views/form/index"),
-  //       meta: { title: "表单示例", icon: "el-icon-s-form" }, // Element UI 表单图标
-  //     },
-  //   ],
-  // },
-
-  // {
-  //   path: "/nested",
-  //   component: Layout,
-  //   redirect: "/nested/menu1",
-  //   name: "Nested",
-  //   meta: {
-  //     title: "嵌套菜单",
-  //     icon: "el-icon-menu", // Element UI 菜单图标
-  //   },
-  //   children: [
-  //     {
-  //       path: "menu1",
-  //       component: () => import("@/views/nested/menu1/index"),
-  //       name: "Menu1",
-  //       meta: { title: "菜单1", icon: "el-icon-minus" }, // 子菜单图标
-  //       children: [
-  //         {
-  //           path: "menu1-1",
-  //           component: () => import("@/views/nested/menu1/menu1-1"),
-  //           name: "Menu1-1",
-  //           meta: { title: "菜单1-1", icon: "el-icon-minus" },
-  //         },
-  //         {
-  //           path: "menu1-2",
-  //           component: () => import("@/views/nested/menu1/menu1-2"),
-  //           name: "Menu1-2",
-  //           meta: { title: "菜单1-2", icon: "el-icon-minus" },
-  //           children: [
-  //             {
-  //               path: "menu1-2-1",
-  //               component: () =>
-  //                 import("@/views/nested/menu1/menu1-2/menu1-2-1"),
-  //               name: "Menu1-2-1",
-  //               meta: { title: "菜单1-2-1", icon: "el-icon-minus" },
-  //             },
-  //             {
-  //               path: "menu1-2-2",
-  //               component: () =>
-  //                 import("@/views/nested/menu1/menu1-2/menu1-2-2"),
-  //               name: "Menu1-2-2",
-  //               meta: { title: "菜单1-2-2", icon: "el-icon-minus" },
-  //             },
-  //           ],
-  //         },
-  //         {
-  //           path: "menu1-3",
-  //           component: () => import("@/views/nested/menu1/menu1-3"),
-  //           name: "Menu1-3",
-  //           meta: { title: "菜单1-3", icon: "el-icon-minus" },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       path: "menu2",
-  //       component: () => import("@/views/nested/menu2/index"),
-  //       name: "Menu2",
-  //       meta: { title: "菜单2", icon: "el-icon-minus" },
-  //     },
-  //   ],
-  // },
 
   // 用户管理路由（Element UI 图标）
   {
@@ -154,18 +58,70 @@ export const constantRoutes = [
   {
     path: "/goods",
     component: Layout,
-    redirect: "/goods/list",
+    redirect: "/goods/index",
     name: "Goods",
     meta: { title: "商品管理", icon: "el-icon-s-goods" }, // Element UI 商品图标
     children: [
       {
-        path: "list",
+        path: "index",
         name: "GoodsList",
         component: () => import("@/views/goods/index"),
-        meta: { title: "商品列表", icon: "el-icon-menu" }, // 子菜单用菜单图标
+        meta: { title: "商品列表", icon: "el-icon-goods" }, // 子菜单用菜单图标
       },
     ],
   },
+
+  // 新增：商品分类管理路由
+  {
+    path: "/category",
+    component: Layout,
+    redirect: "/category/index",
+    name: "Category",
+    meta: { title: "分类管理", icon: "el-icon-s-menu" }, // Element UI 分类/排序图标
+    children: [
+      {
+        path: "index",
+        name: "CategoryList",
+        component: () => import("@/views/category/index"), // 对应分类管理页面组件路径
+        meta: { title: "分类列表", icon: "el-icon-menu" }, // 子菜单保持和商品管理一致的图标
+      },
+    ],
+  },
+
+  // 订单管理路由（Element UI 订单图标）
+  {
+    path: "/order",
+    component: Layout,
+    redirect: "/order/index",
+    name: "Order",
+    meta: { title: "订单管理", icon: "el-icon-s-order" }, // 订单专属图标
+    children: [
+      {
+        path: "index",
+        name: "OrderList",
+        component: () => import("@/views/order/index"),
+        meta: { title: "订单列表", icon: "el-icon-document-copy" }, // 子菜单图标
+      },
+    ],
+  },
+
+  // ========== 新增：留言管理路由 ==========
+  {
+    path: "/message",
+    component: Layout,
+    redirect: "/message/index",
+    name: "Message",
+    meta: { title: "留言管理", icon: "el-icon-chat-dot-round" }, // 留言/聊天专属图标
+    children: [
+      {
+        path: "index",
+        name: "MessageList",
+        component: () => import("@/views/message/index"),
+        meta: { title: "留言列表", icon: "el-icon-chat-line-round" }, // 子菜单图标
+      },
+    ],
+  },
+
   {
     path: "external-link",
     component: Layout,
@@ -176,6 +132,7 @@ export const constantRoutes = [
       },
     ],
   },
+
   // 404 page must be placed at the end !!!
   { path: "*", redirect: "/404", hidden: true },
 ];
