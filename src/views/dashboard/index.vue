@@ -102,9 +102,9 @@
     <!-- 下方区域：分类统计 + 留言滚动区域 -->
     <div class="bottom-wrapper">
       <!-- 分类统计区域（占 2/3） -->
-      <div class="category-stat-section">
+      <div class="category-stat-section" @click="goToPage('/category/index')">
         <!-- 顶部总统计行 -->
-        <div class="category-summary-card card-shadow">
+        <div class="category-summary-card card-shadow" >
           <div class="summary-title">
             <i class="el-icon-menu"></i> 总分类数<span class="text-blue">{{ totalCategory }}</span>个
           </div>
@@ -137,7 +137,7 @@
       </div>
 
       <!-- 留言滚动区域（占 1/3，高度与分类卡片一致） -->
-      <div class="message-scroll-section">
+      <div class="message-scroll-section" @click="goToPage('/message/index')">
         <div class="message-card card-shadow">
           <div class="message-title">
             <i class="el-icon-chat-line-round"></i> 用户留言
@@ -631,10 +631,12 @@ export default {
   width: 100%;
   margin-top: 20px;
 }
+/* 新增：分类统计区域添加手型 */
 .category-stat-section {
   flex: 2;
   display: flex;
   flex-direction: column;
+  cursor: pointer; /* 鼠标悬浮显示手型 */
 }
 .category-summary-card {
   height: 120px;
@@ -676,6 +678,7 @@ export default {
   gap: 20px;
   flex-wrap: wrap;
 }
+/* 新增：分类项卡片添加手型（增强体验，与hover效果匹配） */
 .category-item {
   flex: 1;
   min-width: 280px;
@@ -687,6 +690,7 @@ export default {
   background: #fff;
   padding: 15px;
   text-align: center;
+  cursor: pointer; /* 鼠标悬浮显示手型 */
   &:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
@@ -709,11 +713,14 @@ export default {
 }
 
 /* 留言滚动区域样式（高度与分类卡片一致） */
+/* 新增：留言滚动区域添加手型 */
 .message-scroll-section {
   flex: 1;
   display: flex;
   flex-direction: column;
+  cursor: pointer; /* 鼠标悬浮显示手型 */
 }
+/* 新增：留言卡片添加手型（增强体验） */
 .message-card {
   background: #fff;
   border-radius: 12px;
@@ -721,6 +728,7 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  cursor: pointer; /* 鼠标悬浮显示手型 */
 }
 .message-title {
   font-size: 18px;

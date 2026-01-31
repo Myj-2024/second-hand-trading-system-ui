@@ -128,7 +128,7 @@ export const constantRoutes = [
     children: [
       {
         path: "https://panjiachen.github.io/vue-element-admin-site/#/",
-        meta: { title: "官方文档", icon: "el-icon-link" }, // Element UI 链接图标
+        meta: { title: "项目文档", icon: "el-icon-link" }, // Element UI 链接图标
       },
     ],
   },

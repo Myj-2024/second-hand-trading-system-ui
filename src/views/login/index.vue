@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">二手交易平台登录</h3>
+        <h3 class="title">📦二手物品交易管理系统</h3>
       </div>
 
       <el-form-item prop="username">
@@ -50,12 +50,13 @@
       </div>
 
     </el-form>
+
+    <global-footer />
   </div>
 </template>
 
 <script>
-// 移除前端硬编码的validUsername校验导入
-// import { validUsername } from '@/utils/validate'
+
 
 export default {
   name: 'Login',
@@ -240,6 +241,20 @@ $light_gray:#eee;
     color: $dark_gray;
     cursor: pointer;
     user-select: none;
+  }
+
+  .global-footer {
+    background-color: transparent !important; // 强制透明背景
+    border-top: none !important; // 移除顶部边框
+    text-align: center !important; // 强制文字居中
+    color: #ccc !important; // 浅灰色文字适配深色背景
+    position: fixed;
+    left: 0;
+    bottom: 20px; // 底部留20px间距，更美观
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 20px;
   }
 }
 </style>

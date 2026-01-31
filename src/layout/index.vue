@@ -7,6 +7,8 @@
         <navbar />
       </div>
       <app-main />
+      <!-- 新增：全局 Footer 组件-->
+      <global-footer />
     </div>
   </div>
 </template>
@@ -14,13 +16,17 @@
 <script>
 import { Navbar, Sidebar, AppMain } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
+// 引入 GlobalFooter 组件
+import GlobalFooter from '@/components/GlobalFooter'
 
 export default {
   name: 'Layout',
   components: {
     Navbar,
     Sidebar,
-    AppMain
+    AppMain,
+    // 注册 GlobalFooter 组件
+    GlobalFooter
   },
   mixins: [ResizeMixin],
   computed: {

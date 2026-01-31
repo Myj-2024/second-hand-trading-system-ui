@@ -24,6 +24,11 @@ export default {
   width: 100%;
   position: relative;
   overflow: hidden;
+  min-height: calc(100vh - 50px);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 60px; /* 新增：避开底部 Footer，防止内容被遮挡 */
 }
 .fixed-header+.app-main {
   padding-top: 50px;
